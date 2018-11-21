@@ -21,7 +21,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserService userService;
 
 
-    private final PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public WebSecurityConfig(PasswordEncoder passwordEncoder) {
