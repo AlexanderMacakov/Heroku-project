@@ -27,15 +27,17 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String addUser(@Valid User user, BindingResult bindingResult, Model model) {
 
-        if (user.getPassword() != null && !user.getPassword().equals(user.getPassword2())) {
-            model.addAttribute("passwordError", "Password are not dirrerent!");
-        }
 
         if (bindingResult.hasErrors()) {
-            Map<String, String> errors = ContorllerUtils.getErrors(bindingResult);
+            Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
 
             model.mergeAttributes(errors);
 
+            return "registration";
+        }
+
+        if (user.getPassword() != null && !user.getPassword().equals(user.getPassword2())) {
+            model.addAttribute("passwordError", "Passwords are different!");
             return "registration";
         }
 

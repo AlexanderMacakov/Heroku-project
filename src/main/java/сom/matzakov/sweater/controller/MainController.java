@@ -6,7 +6,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,12 +19,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+
 
 @Controller
 public class MainController {
-
     @Autowired
     private MessageRepository messageRepository;
 
@@ -41,15 +38,15 @@ public class MainController {
     public String main(@RequestParam(required = false, defaultValue = "") String filter, Model model) {
         Iterable<Message> messages = messageRepository.findAll();
 
-        if(filter != null && !filter.isEmpty()) {
+        if (filter != null && !filter.isEmpty()) {
             messages = messageRepository.findByTag(filter);
-        }
-        else {
+        } else {
             messages = messageRepository.findAll();
         }
 
         model.addAttribute("messages", messages);
         model.addAttribute("filter", filter);
+
         return "main";
     }
 
@@ -61,15 +58,13 @@ public class MainController {
             Model model,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
-
         message.setAuthor(user);
 
         if (bindingResult.hasErrors()) {
+            Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
 
-            Map<String, String> errorsMap = ContorllerUtils.getErrors(bindingResult);
             model.mergeAttributes(errorsMap);
             model.addAttribute("message", message);
-
         } else {
             if (file != null && !file.getOriginalFilename().isEmpty()) {
                 File uploadDir = new File(uploadPath);
@@ -79,10 +74,11 @@ public class MainController {
                 }
 
                 String uuidFile = UUID.randomUUID().toString();
-                String rezultFilename = uuidFile + "." + file.getOriginalFilename();
+                String resultFilename = uuidFile + "." + file.getOriginalFilename();
 
-                file.transferTo(new File(uploadPath + "/" + rezultFilename));
-                message.setFilename(rezultFilename);
+                file.transferTo(new File(uploadPath + "/" + resultFilename));
+
+                message.setFilename(resultFilename);
             }
 
             model.addAttribute("message", null);
@@ -91,8 +87,9 @@ public class MainController {
         }
 
         Iterable<Message> messages = messageRepository.findAll();
+
         model.addAttribute("messages", messages);
+
         return "main";
     }
-
 }
