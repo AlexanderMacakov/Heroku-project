@@ -16,7 +16,7 @@ public class Message {
     @Length(max = 2048, message = "Message too long")
     private String text;
 
-    @Length(max = 255, message = "Tag too long")
+    @Length(max = 255, message = "Tag too long ")
     private String tag;
 
     @ManyToOne(fetch = FetchType.EAGER)
