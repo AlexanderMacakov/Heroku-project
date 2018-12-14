@@ -4,10 +4,10 @@
     <#list messages as message>
         <div class="card my-3">
             <#if message.filename??>
-                <img src="/img/${message.filename}" class="card-img-top">
+                <img src="https://res.cloudinary.com/dc5lumqtr/image/upload/v1544792197/img/${message.filename}" class="card-img-top">
             </#if>
             <div class="m-2">
-            <span>${message.text}</span> <br>
+            <span>${message.text}</span> <br>M
             <i>#${message.tag}</i>
             </div>
             <div class="card-footer text-muted">

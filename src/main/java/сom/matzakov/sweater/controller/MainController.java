@@ -1,5 +1,6 @@
 package сom.matzakov.sweater.controller;
 
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import сom.matzakov.sweater.config.CloudinaryConfig;
 import сom.matzakov.sweater.domain.Message;
 import сom.matzakov.sweater.domain.User;
 import сom.matzakov.sweater.repos.MessageRepository;
@@ -26,8 +28,12 @@ import java.util.UUID;
 
 @Controller
 public class MainController {
+
     @Autowired
     private MessageRepository messageRepository;
+
+    @Autowired
+    CloudinaryConfig cloudc;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -133,22 +139,33 @@ public class MainController {
             @Valid Message message,
             @RequestParam("file") MultipartFile file) throws IOException
     {
-        if (file != null && !file.getOriginalFilename().isEmpty()) {
-            File uploadDir = new File(uploadPath);
+        String uuidFile = UUID.randomUUID().toString();
+        String resultFilename = uuidFile;
 
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+
+            if(message.getFilename() != null) {
+                if(!message.getFilename().equals(file.getOriginalFilename())) {
+                    cloudc.delete(message.getFilename());
+                }
             }
 
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename();
-
-            file.transferTo(new File(uploadPath + "/" + resultFilename));
+            Map params = ObjectUtils.asMap("resourcetype", "auto");
+            params.put("public_id", "img/" + resultFilename);
+            Map uploadResult =  cloudc.upload(file.getBytes(), params);
 
             message.setFilename(resultFilename);
+
         }
     }
+
+
+
+
+
 }
+
+
 
 
 
